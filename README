@@ -1,0 +1,3 @@
+Tool to compare ODIS-Engineering backups. Be aware this only supports JSON and
+not the default output of the tool, xml. In order to convert this to JSON use
+any available tool from the internet, like https://www.freeformatter.com/xml-to-json-converter.html.
