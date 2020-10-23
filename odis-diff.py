@@ -1,6 +1,4 @@
 #!/usr/bin/python
-
-import os
 import sys
 import json
 
@@ -219,9 +217,7 @@ def beginCompare(base_ecus, other_ecus):
 
         if len(html_result) > 1:
             html_body += (
-                MODULE_NAME.format(
-                    module_name="ECU {} - {}".format(ecu_id, base_ecu["ecu_name"])
-                )
+                MODULE_NAME.format(module_name="ECU {} - {}".format(ecu_id, base_ecu["ecu_name"]))
                 + html_result
             )
 
