@@ -1,7 +1,11 @@
-#!/usr/bin/python
-import sys
+#!/usr/local/bin/python3
+import argparse
 import json
+import logging
+import os
+from enum import Enum
 
+import xmltodict
 
 HTML_FILE = """
 <HTML>
@@ -64,12 +68,30 @@ ROW = """
 """
 
 
-def loadJson(path):
-    data = None
-    with open(path) as json_file:
-        data = json.load(json_file)
+class FileType(Enum):
+    JSON = (0,)
+    XML = 1
 
-    return data
+
+def loadFile(path):
+    data = None
+    file_type = None
+
+    try:
+        fh = open(path)
+        _, ext = os.path.splitext(path)
+
+        if ext.upper() == ".JSON":
+            data = json.load(fh)
+            file_type = FileType.JSON
+        elif ext.upper() == ".XML":
+            data = xmltodict.parse(fh.read())
+            file_type = FileType.XML
+    except Exception:
+        logging.error("Unable to parse {}".format(path))
+        exit(1)
+
+    return data, file_type
 
 
 def sortInfoLists(base, other, field):
@@ -212,7 +234,7 @@ def beginCompare(base_ecus, other_ecus):
         if other_ecu is None:
             continue
 
-        print("Analyzing ECU {} - {}".format(ecu_id, base_ecu["ecu_name"]))
+        logging.info("Analyzing ECU {} - {}".format(ecu_id, base_ecu["ecu_name"]))
         html_result = diffEcu(base_ecu=base_ecu, other_ecu=other_ecu)
 
         if len(html_result) > 1:
@@ -225,29 +247,33 @@ def beginCompare(base_ecus, other_ecus):
 
 
 def main():
-    if len(sys.argv) < 3:
-        print("Please use: odis-diff.py file1 file2")
+    parser = argparse.ArgumentParser(description="ODIS-E Backup diff tool.")
 
-    base_json = loadJson(sys.argv[1])
+    parser.add_argument("files", metavar="N", type=str, nargs=2, help="XML/JSON files to compare.")
 
-    if base_json is None:
-        print("{} is an invalid json".format(sys.argv[1]))
-        return 1
+    args = parser.parse_args()
 
-    other_json = loadJson(sys.argv[2])
-    if other_json is None:
-        print("{} is an invalid json".format(sys.argv[2]))
-        return 1
+    base_file, base_type = loadFile(args.files[0])
+
+    other_file, other_type = loadFile(args.files[1])
+
+    logging.basicConfig(level=logging.INFO)
 
     base_ecus = sorted(
-        base_json["vehicle"]["communications"]["ecus"]["ecu"], key=lambda obj: obj.get("ecu_id")
+        base_file["vehicle"]["communications"]["ecus"]["ecu"]
+        if base_type == FileType.JSON
+        else base_file["protocol"]["vehicle"]["communications"]["ecus"]["ecu"],
+        key=lambda obj: obj.get("ecu_id"),
     )
 
     # List to dict
     base_ecus = {element["ecu_id"]: element for element in base_ecus}
 
     other_ecus = sorted(
-        other_json["vehicle"]["communications"]["ecus"]["ecu"], key=lambda obj: obj.get("ecu_id")
+        other_file["vehicle"]["communications"]["ecus"]["ecu"]
+        if other_type == FileType.JSON
+        else other_file["protocol"]["vehicle"]["communications"]["ecus"]["ecu"],
+        key=lambda obj: obj.get("ecu_id"),
     )
 
     # List to dict
