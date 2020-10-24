@@ -10,10 +10,7 @@
       "request": "launch",
       "program": "odis-diff.py",
       "console": "integratedTerminal",
-      "args": [
-        "mine.json",
-        "other.json"
-      ]
+      "args": []
     }
   ]
 }
