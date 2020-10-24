@@ -7,65 +7,7 @@ from enum import Enum
 
 import xmltodict
 
-HTML_FILE = """
-<HTML>
-{head}
-<BODY>
-{body_content}
-</BODY>
-</HTML>
-"""
-
-HEADLINES = {
-    "ident": """<h2 style="color: #2e3280;">Master - 001 Identification</h2>""",
-    "coding_read": """<h2 style="color: #2e3280;">Master - 006 Read Coding</h2>""",
-    "adaption_read": """<h2 style="color: #2e3280;">Master - 007 Read Adaptions</h2>""",
-}
-
-MODULE_NAME = """<h1 style="color: #2e6c80;">{module_name}:</h1>"""
-
-HEAD = """
-<head>
-<style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
-
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
-
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-</style>
-</head>
-"""
-
-TABLE = """
-<table>
-  <tr>
-    <th>{name}</th>
-    <th>Original</th>
-    <th>Other</th>
-  </tr>
-  <tr>
-  {content}
-  </tr>
-</table>
-"""
-
-ROW = """
-<tr>
-    <td>{name}</td>
-    <td style="background-color:#00FF00">{left_val}</td>
-    <td style="background-color:#FF0000">{right_val}</td>
-</tr>
-"""
+import html_data
 
 
 class FileType(Enum):
@@ -108,7 +50,7 @@ def sortInfoLists(base, other, field):
 
 
 def buildHtmlLine(diff_name, diff_value_left, diff_value_right):
-    return ROW.format(
+    return html_data.ROW.format(
         name=diff_name,
         left_val=diff_value_left if not None else " ",
         right_val=diff_value_right if not None else " ",
@@ -203,7 +145,7 @@ def diff(base, other, tableName):
                 )
 
     if len(html_elements) > 0:
-        return TABLE.format(name=tableName, content=html_elements)
+        return html_data.TABLE.format(name=tableName, content=html_elements)
 
     return ""
 
@@ -221,7 +163,7 @@ def diffEcu(base_ecu, other_ecu):
             html_result = diff(block["values"], other_ecu["ecu_master"][idx]["values"], "Coding")
 
         if len(html_result):
-            html_body += HEADLINES[block["@type"]] + html_result
+            html_body += html_data.HEADLINES[block["@type"]] + html_result
 
     return html_body
 
@@ -239,7 +181,9 @@ def beginCompare(base_ecus, other_ecus):
 
         if len(html_result) > 1:
             html_body += (
-                MODULE_NAME.format(module_name="ECU {} - {}".format(ecu_id, base_ecu["ecu_name"]))
+                html_data.MODULE_NAME.format(
+                    module_name="ECU {} - {}".format(ecu_id, base_ecu["ecu_name"])
+                )
                 + html_result
             )
 
@@ -279,8 +223,8 @@ def main():
     # List to dict
     other_ecus = {element["ecu_id"]: element for element in other_ecus}
 
-    html = HTML_FILE.format(
-        head=HEAD, body_content=beginCompare(base_ecus=base_ecus, other_ecus=other_ecus)
+    html = html_data.HTML_FILE.format(
+        head=html_data.HEAD, body_content=beginCompare(base_ecus=base_ecus, other_ecus=other_ecus)
     )
 
     with open("result.html", "w") as fd:
