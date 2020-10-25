@@ -5,6 +5,12 @@ The `diff` file is generated in an `html` format in `result.html`.
 
 ## Project setup and usage
 
+On MacOS only you must setup the virtualenvwrapper:
+```
+source /usr/local/bin/virtualenvwrapper.sh
+```
+
+Setup the virtualenv:
 ```
 mkvirtualenv -p /usr/bin/python3 odis-diff
 pip install -r requirements.txt
