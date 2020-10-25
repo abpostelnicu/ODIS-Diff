@@ -17,6 +17,11 @@ pip install -r requirements.txt
 ./odis-diff source.xml target.xml
 ```
 
+If you want to do it in an automatic way just:
+```
+./create-venv.macos
+```
+
 ## Development
 
 You are more than welcome to `fork` this project and contribute to it.

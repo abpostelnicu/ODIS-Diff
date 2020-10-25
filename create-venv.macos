@@ -1,0 +1,9 @@
+#!/bin/bash
+
+python3 -m venv .venv/odis-diff
+
+source .venv/odis-diff/bin/activate
+
+pip install -r requirements.txt
+
+source .venv/odis-diff/bin/activate
