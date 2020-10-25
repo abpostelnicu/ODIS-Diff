@@ -1,5 +1,8 @@
+.vscode/
+__pycache__/
+build/
+dist/
 *.html
 *.json
 *.xml
-__pycache__/
-.vscode/
+*.spec

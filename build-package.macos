@@ -1,0 +1,6 @@
+#!/bin/bash
+
+pyinstaller --onefile odis-diff.py
+
+# Cleanup the build directory
+rm -rf build/
