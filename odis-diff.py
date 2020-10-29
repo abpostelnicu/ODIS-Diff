@@ -38,14 +38,16 @@ def loadFile(path):
 
 
 def sortInfoLists(base, other, field):
-    base = {
-        element["display_name"]: element
-        for element in sorted(base, key=lambda element: element.get(field))
-    }
-    other = {
-        element["display_name"]: element
-        for element in sorted(other, key=lambda element: element.get(field))
-    }
+    if isinstance(base, list):
+        base = {
+            element["display_name"]: element
+            for element in sorted(base, key=lambda element: element.get(field))
+        }
+    if isinstance(other, list):
+        other = {
+            element["display_name"]: element
+            for element in sorted(other, key=lambda element: element.get(field))
+        }
 
     return base, other
 
@@ -159,7 +161,7 @@ def diffEcu(base_ecu, other_ecu):
         if block["@type"] == "ident":
             html_result = diff(block["values"], other_ecu["ecu_master"][idx]["values"], "Field")
         elif block["@type"] == "adaption_read":
-            html_result = diffAdaptions(block["values"], other_ecu["ecu_master"][idx]["values"])
+            html_result = diffAdaptions(block["values"], other_ecu["ecu_master"][idx]["values"] if idx < len(other_ecu["ecu_master"]) else [])
         elif block["@type"] == "coding_read":
             html_result = diff(block["values"], other_ecu["ecu_master"][idx]["values"], "Coding")
 
